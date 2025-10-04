@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kistenliste Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        .timestamp {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 150px;
+            margin: 10px;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+            transition: transform 0.2s;
+        }
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        .charts {
+            margin: 30px 0;
+        }
+        .charts img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            color: #1f2937;
+            border-bottom: 3px solid #2563eb;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        tr:hover {
+            background: #f9fafb;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        h2 {
+            color: #1f2937;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ Kistenliste Dashboard</h1>
+        <div class="subtitle">Automatische Auswertung deiner Fußballmannschaft</div>
+        <div class="timestamp">Letzte Aktualisierung: {{TIMESTAMP}}</div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value">{{GESAMT}}</div>
+                <div class="stat-label">Gesamt Einträge</div>
+            </div>
+            <div class="stat-box" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); box-shadow: 0 4px 6px rgba(22, 163, 74, 0.3);">
+                <div class="stat-value">{{BEZAHLT}}</div>
+                <div class="stat-label">Bezahlt</div>
+            </div>
+            <div class="stat-box" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);">
+                <div class="stat-value">{{OFFEN}}</div>
+                <div class="stat-label">Offen</div>
+            </div>
+            <div class="stat-box" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);">
+                <div class="stat-value">{{PERSONEN}}</div>
+                <div class="stat-label">Personen</div>
+            </div>
+        </div>
+        
+        <div class="charts">
+            <img src="data:image/png;base64,{{DIAGRAMM_BASE64}}" alt="Diagramme">
+        </div>
+        
+        <h2>🏆 Rangliste</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Rang</th>
+                    <th>Name</th>
+                    <th style="text-align: right; width: 150px;">Anzahl Kisten</th>
+                </tr>
+            </thead>
+            <tbody>
+{{RANKING_ROWS}}
+            </tbody>
+        </table>
+        
+        <div class="footer">
+            💡 Generiert mit Python • Führe <code>python kistenliste_analyzer.py</code> erneut aus, um die Daten zu aktualisieren
+        </div>
+    </div>
+</body>
+</html>
