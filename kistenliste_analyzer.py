@@ -205,7 +205,7 @@ def save_dashboard(df, fig, stats, ranking):
         """
 
     # HTML-Template laden und ersetzen
-    template_path = "dashboard_template.html"
+    template_path = "index.html"
 
     if os.path.exists(template_path):
         with open(template_path, "r", encoding="utf-8") as f:
@@ -213,9 +213,7 @@ def save_dashboard(df, fig, stats, ranking):
     else:
         # Falls Template nicht existiert, Fallback verwenden
         print("⚠️  Template nicht gefunden, erstelle es...")
-        create_template()
-        with open(template_path, "r", encoding="utf-8") as f:
-            html_content = f.read()
+        print("   Erstelle index.html Template...")
 
     # Platzhalter ersetzen
     html_content = html_content.replace(
