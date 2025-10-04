@@ -39,6 +39,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+"""
+- Lädt die Excel-Datei Kistenliste.xlsx (Sheet: "Kistenliste").
+- Bereinigt die Spalte "Name" und den Bezahlstatus ("Bezahlt").
+- Erstellt eine neue Spalte Bezahlt_Status mit den Werten "Bezahlt" oder "Offen".
+- Gibt das DataFrame zurück oder zeigt einen Fehler an.
+"""
+
 
 @st.cache_data
 def load_data():
@@ -57,6 +64,62 @@ def load_data():
     except Exception as e:
         st.error(f"❌ Fehler beim Laden der Datei: {e}")
         return None
+
+
+"""
+Erstellt Tabelle mit offenen Kisten pro Person:
+- Berücksichtigt "Geteilte Kisten" und teilt diese anteilig auf.
+- Gibt eine sortierte Tabelle mit Namen und Anzahl offener Kisten zurück.
+"""
+
+
+def create_open_boxes_table(df):
+    """Erstellt Tabelle mit offenen Kisten pro Person"""
+    # Nur offene Kisten
+    open_df = df[df["Bezahlt_Status"] == "Offen"].copy()
+
+    # Namen und deren Anzahl sammeln
+    name_counts = {}
+
+    for _, row in open_df.iterrows():
+        name = str(row["Name"]).strip()
+
+        # Prüfen ob "geteilte Kisten"
+        if name.lower() == "geteilte kisten":
+            # Namen aus Anmerkung auslesen
+            anmerkung = str(row.get("Anmerkung", ""))
+            if anmerkung and anmerkung != "nan":
+                # Teile an Kommas
+                shared_names = [n.strip() for n in anmerkung.split(",") if n.strip()]
+                # Jeder bekommt anteilig 1/Anzahl
+                fraction = 1.0 / len(shared_names) if shared_names else 0
+                for shared_name in shared_names:
+                    name_counts[shared_name] = (
+                        name_counts.get(shared_name, 0) + fraction
+                    )
+        else:
+            # Normaler Eintrag - volle Kiste
+            name_counts[name] = name_counts.get(name, 0) + 1.0
+
+    # In DataFrame umwandeln
+    if name_counts:
+        result = pd.DataFrame(
+            list(name_counts.items()), columns=["Name", "Offene Kisten"]
+        )
+        result = result.sort_values("Offene Kisten", ascending=False)
+        # Runden auf 2 Dezimalstellen
+        result["Offene Kisten"] = result["Offene Kisten"].round(2)
+        return result
+    else:
+        return pd.DataFrame({"Name": [], "Offene Kisten": []})
+
+
+"""
+- Erstellt ein gestapeltes horizontales Balkendiagramm:
+- Zeigt für jede Person die Anzahl bezahlter und offener Kisten.
+- Sortiert nach Gesamtanzahl.
+- Zeigt die Werte direkt an den Balken.
+"""
 
 
 def create_person_chart(df):
@@ -82,8 +145,8 @@ def create_person_chart(df):
     # Diagramm für Kisten pro Person
     # Dynamische Höhe basierend auf Anzahl der Namen
     n_people = len(name_stats)
-    height = max(6, n_people * 0.4)  # Minimum 6, sonst 0.4 pro Person
-    fig, ax = plt.subplots(figsize=(10, height))
+    height = max(8, n_people * 0.4)  # Minimum 8, sonst 0.4 pro Person
+    fig, ax = plt.subplots(figsize=(12, height))
     fig.patch.set_facecolor("white")
     y_pos = range(len(name_stats))
 
@@ -128,6 +191,12 @@ def create_person_chart(df):
     return fig
 
 
+"""
+Erstellt ein Tortendiagramm:
+Zeigt den Anteil "Bezahlt" vs. "Offen" für alle Einträge.
+"""
+
+
 def create_payment_chart(df):
     """Erstellt Tortendiagramm für Bezahlstatus"""
     bezahlt_counts = df["Bezahlt_Status"].value_counts()
@@ -151,6 +220,13 @@ def create_payment_chart(df):
 
     plt.tight_layout()
     return fig
+
+
+"""
+Erstellt ein horizontales Balkendiagramm:
+Zeigt die Top 10 häufigsten Gründe aus der Spalte "Grund".
+Werte werden direkt angezeigt.
+"""
 
 
 def create_reasons_chart(df):
@@ -184,6 +260,14 @@ def create_reasons_chart(df):
     return fig
 
 
+"""
+Erstellt eine Tabelle:
+Listet Personen nach Anzahl Kisten absteigend.
+Vergibt Medaillen-Emojis für die Top 3.
+Fügt Rangnummern hinzu.
+"""
+
+
 def create_ranking_table(df):
     """Erstellt Rangliste"""
     ranking = df["Name"].value_counts().reset_index()
@@ -197,6 +281,25 @@ def create_ranking_table(df):
 
 
 # Hauptapp
+"""
+
+Header und Beschreibung:
+- Titel, Untertitel und Zeitstempel werden angezeigt.
+Daten laden:
+- Holt die Daten mit load_data().
+Statistiken:
+- Zeigt Gesamtanzahl, Anzahl bezahlter/offener Kisten und Personen als Metriken.
+Diagramme:
+- Zeigt die Diagramme nebeneinander (Kisten pro Person, Bezahlstatus).
+Gründe:
+- Zeigt die Top 10 Gründe als Diagramm.
+Rangliste:
+- Zeigt die Rangliste als gestylte Tabelle.
+Footer:
+- Hinweis zur automatischen Aktualisierung.
+"""
+
+
 def main():
     # Header
     st.title("⚽ Fc Münster 05 1. Mannschaft")
@@ -235,6 +338,23 @@ def main():
         st.metric("Offen", offen_count, delta=None, delta_color="inverse")
     with col4:
         st.metric("Personen", personen_count)
+
+    st.markdown("---")
+
+    # Offene Kisten Tabelle
+    st.subheader("⚠️ Offene Kisten")
+    open_boxes = create_open_boxes_table(df)
+    st.dataframe(
+        open_boxes,
+        hide_index=True,
+        width="stretch",
+        column_config={
+            "Name": st.column_config.TextColumn("Name", width="large"),
+            "Offene Kisten": st.column_config.NumberColumn(
+                "Offene Kisten", width="small"
+            ),
+        },
+    )
 
     st.markdown("---")
 
