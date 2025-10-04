@@ -11,7 +11,7 @@ from datetime import datetime
 
 # Seitenkonfiguration
 st.set_page_config(
-    page_title="Kistenliste Dashboard",
+    page_title="Fc Münster 05 Kistenliste",
     page_icon="⚽",
     layout="wide",
     initial_sidebar_state="collapsed",
