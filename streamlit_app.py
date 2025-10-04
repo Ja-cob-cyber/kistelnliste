@@ -11,7 +11,7 @@ from datetime import datetime
 
 # Seitenkonfiguration
 st.set_page_config(
-    page_title="Fc Münster 05 Kistenliste",
+    page_title="Fc Münster 05 ",
     page_icon="⚽",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -199,9 +199,9 @@ def create_ranking_table(df):
 # Hauptapp
 def main():
     # Header
-    st.title("⚽ Kistenliste Dashboard")
+    st.title("⚽ Fc Münster 05 1. Mannschaft")
     st.markdown(
-        '<p style="text-align: center; color: #6b7280; font-size: 18px;">Automatische Auswertung deiner Fußballmannschaft</p>',
+        '<p style="text-align: center; color: #6b7280; font-size: 18px;">Aktuelle Liste von offenen Bierkisten</p>',
         unsafe_allow_html=True,
     )
 
@@ -268,7 +268,7 @@ def main():
     st.dataframe(
         ranking,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         column_config={
             "Rang": st.column_config.NumberColumn("Rang", width="small"),
             "Medaille": st.column_config.TextColumn("", width="small"),
