@@ -79,8 +79,11 @@ def create_person_chart(df):
     name_stats["Gesamt"] = name_stats["Bezahlt"] + name_stats["Offen"]
     name_stats = name_stats.sort_values("Gesamt", ascending=True)
 
-    # Diagramm erstellen
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Diagramm für Kisten pro Person
+    # Dynamische Höhe basierend auf Anzahl der Namen
+    n_people = len(name_stats)
+    height = max(6, n_people * 0.4)  # Minimum 6, sonst 0.4 pro Person
+    fig, ax = plt.subplots(figsize=(10, height))
     fig.patch.set_facecolor("white")
     y_pos = range(len(name_stats))
 
@@ -129,7 +132,7 @@ def create_payment_chart(df):
     """Erstellt Tortendiagramm für Bezahlstatus"""
     bezahlt_counts = df["Bezahlt_Status"].value_counts()
 
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(5, 5))
     fig.patch.set_facecolor("white")
 
     colors_pie = ["#16a34a", "#dc2626"]
